@@ -3,11 +3,10 @@ dotenv.config();
 const User = require("../Schema/userSchema");
 const bcrypt = require("bcrypt");
 
+//Create User :
 const createUser = async (req, res) => {
     try {
-        // console.log(req.body);
         const { email, password } = req.body
-
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(409).json({ message: "Email is already taken." });
@@ -32,8 +31,7 @@ const createUser = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 }
-
-
+//Get User Data by id :
 const GetUserData = async (req, res) => {
     try {
         const data = await User.findOne({ _id: req.user.user_id });

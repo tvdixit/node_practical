@@ -22,18 +22,13 @@ const idValidation = {
     })
 }
 
-// const idValidation = Joi.object().keys({
-//     user_id: Joi.string().required(),
-// })
-
-
 const taskidValidation = {
     query: Joi.object().keys({
         id: Joi.string().required(),
     })
 }
 
-const prioritySchema = {
+const priorityCheck = {
     query: Joi.object().keys({
         priority: Joi.string().required(),
     })
@@ -42,5 +37,5 @@ module.exports = {
     CreateTaskValidation,
     idValidation,
     taskidValidation,
-    prioritySchema
+    priorityCheck
 }

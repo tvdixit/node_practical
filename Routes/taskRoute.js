@@ -6,8 +6,8 @@ const multer = require("multer")
 const { v4: uuidv4 } = require('uuid');
 const { auth } = require("../middleware/auth")
 const validate = require("../middleware/validate")
-const { CreateTaskValidation, idValidation, taskidValidation, prioritySchema } = require("../Validation/taskValidation")
-const { createTask, GetTaskData, TaskbyDESC, TaskdataPagination, deleteTaskData, updatetask, deletetask, deletedtask, taskpriority } = require("../Controller/taskController");
+const { CreateTaskValidation, idValidation, taskidValidation, priorityCheck } = require("../Validation/taskValidation")
+const { createTask, GetTaskData, TaskbyDESC, TaskdataPagination, deleteTaskData, updatetask, deletetask, deletedtask, taskpriority, getAllTasks } = require("../Controller/taskController");
 
 
 const profileUpload = multer({
@@ -40,7 +40,9 @@ router
 
     .get("/deleted", deletedtask)
 
-    .get("/", validate(prioritySchema), taskpriority)
+    .get("/", validate(priorityCheck), taskpriority) // check priority
+
+    .get("/priority", getAllTasks)
 module.exports = {
     route: router
 }
