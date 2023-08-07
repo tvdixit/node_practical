@@ -4,21 +4,20 @@ const Task = require("../Schema/taskSchema");
 
 //Create Task Api
 const createTask = async (req, res) => {
+
     try {
-        console.log(req.body.image, "body")
-        let newobject = []
-        for (let i = 0; i < req.files.length; i++) {
-            newobject.push(req.files[i].filename)
-        }
+        const { name, description, image, user_id, due_date, priority, is_completed, is_deleted } = req.body
+
+
         const newTask = new Task({
-            name: req.body.name,
-            description: req.body.description,
-            image: newobject,
-            user_id: req.body.user_id,
-            due_date: req.body.due_date,
-            priority: req.body.priority,
-            is_completed: req.body.is_completed,
-            is_deleted: req.body.is_deleted
+            name,//: req.body.name,
+            description, //: req.body.description,
+            image,//: newobject,
+            user_id,//: req.body.user_id,
+            due_date,//: req.body.due_date,
+            priority,//: req.body.priority,
+            is_completed,//: req.body.is_completed,
+            is_deleted//: req.body.is_deleted
         });
         const savedTask = await newTask.save();
         res.status(201).json({ savedTask });

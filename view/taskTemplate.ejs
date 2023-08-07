@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Create New Task</title>
+</head>
+
+<body style="background-color: aqua;">
+    <h1>Create New Task</h1>
+
+    <form method="POST" action="/tasktemp/createtask">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name"><br>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description"></textarea><br>
+
+        <label for="image">Image:</label>
+        <input type="file" id="image" name="image" accept="image/*"><br>
+
+        <label for="user_id">User ID:</label>
+        <input type="text" id="user_id" name="user_id"><br>
+
+        <label for="due_date">Due Date:</label>
+        <input type="date" id="due_date" name="due_date"><br>
+
+        <label for="priority">Priority:</label>
+        <select id="priority" name="priority">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select><br>
+
+        <label for="is_completed">Is Completed:</label>
+        <select id="is_completed" name="is_completed">
+            <option value="0">0</option>
+            <option value="1">1</option>
+        </select><br>
+
+        <label for="is_deleted">Is Deleted:</label>
+        <select id="is_deleted" name="is_deleted">
+            <option value="0">0</option>
+            <option value="1">1</option>
+        </select><br>
+        <button type="submit">Create Task</button>
+    </form>
+</body>
+
+</html>

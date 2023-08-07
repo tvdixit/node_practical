@@ -37,6 +37,7 @@ const auth = () => async (req, res, next) => {
 const Userlogin = async (req, res) => {
     try {
         const { email, password } = req.body
+        console.log(req.body, "body");
         const users = await User.findOne({ email })
         console.log(users);
         if (!users) {

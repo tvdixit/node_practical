@@ -5,27 +5,31 @@ const bcrypt = require("bcrypt");
 
 //Create User :
 const createUser = async (req, res) => {
+    console.log(req.body, "body")
+
     try {
-        const { email, password } = req.body
+        const { first_name, last_name, email, password } = req.body;
+
+        // console.log(req.body);
+
+
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(409).json({ message: "Email is already taken." });
         }
         const saltRounds = 10;
-        bcrypt.hash(password, saltRounds, async function (err, hash) {
-            if (err) {
-                return res.status(500).json({ message: "An error occurred while hashing the password." });
-            }
-            const userdata = new User({
-                first_name: req.body.first_name,
-                last_name: req.body.last_name,
-                email: req.body.email,
-                password: hash,
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-            })
-            const savedata = await userdata.save();
-            res.status(200).json({ savedata });
-        });
+        const userdata = new User({
+            first_name,
+            last_name,
+            email,
+            password: hashedPassword,
+
+        })
+        const savedata = await userdata.save();
+        res.status(200).json({ savedata });
+
 
     } catch (error) {
         res.status(400).json({ message: error.message });
