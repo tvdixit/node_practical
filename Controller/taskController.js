@@ -1,24 +1,32 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const Task = require("../Schema/taskSchema");
+const ejs = require('ejs');
+const fs = require('fs');
+const moment = require('moment');
 
+exports.index = function (req, res) {
+    res.render('server', { moment: moment });
+}
 //Create Task Api
 const createTask = async (req, res) => {
 
     try {
         const { name, description, image, user_id, due_date, priority, is_completed, is_deleted } = req.body
 
-
+        const parsedDueDate = moment(due_date).format('DD/MM/YYYY');
         const newTask = new Task({
             name,//: req.body.name,
             description, //: req.body.description,
             image,//: newobject,
             user_id,//: req.body.user_id,
-            due_date,//: req.body.due_date,
+            due_date: parsedDueDate,//: req.body.due_date,
             priority,//: req.body.priority,
             is_completed,//: req.body.is_completed,
             is_deleted//: req.body.is_deleted
         });
+        console.log(parsedDueDate, "duedate");
+        console.log(due_date);
         const savedTask = await newTask.save();
         res.status(201).json({ savedTask });
     } catch (error) {
@@ -58,12 +66,13 @@ const TaskdataPagination = async (req, res) => {
             .limit(limit)
             .sort({ created_date: -1 })
             .exec();
-        res.status(200).json({
+        const renderedTemplate = res.render('taskPagination', {
             tasks: tasks,
             page: page,
             limit: limit,
             search: search,
             total: totalCount,
+            skip: skip,
         });
     }
     catch (error) {
@@ -175,6 +184,41 @@ const getAllTasks = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch tasks by priority' });
     }
 };
+
+// update api :
+const UpdateTask = async (req, res) => {
+    try {
+        const data = await Task.findOne({ _id: req.params.id })
+
+        data.set(req.body);
+        const updatedUser = await data.save();
+        res.json({ updatedUser });
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
+const EditTask = async (req, res) => {
+    try {
+        const taskid = req.params.id
+        const updatedTaskData = {
+            name: req.body.name,
+            description: req.body.description
+
+        };
+        const task = await Task.findByIdAndUpdate(taskid, updatedTaskData, { new: true });
+        console.log(task, "task");
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+        const savedata = task.save()
+        res.render('task_editPagination', { task });
+
+
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
 module.exports = {
     createTask,
     GetTaskData,
@@ -185,5 +229,7 @@ module.exports = {
     deletetask,
     deletedtask,
     taskpriority,
-    getAllTasks
+    getAllTasks,
+    UpdateTask,
+    EditTask
 }

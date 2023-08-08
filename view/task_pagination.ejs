@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -17,56 +17,6 @@
         <a href="?page= page + 1 &limit= limit &search= search ">Next</a>
 
     </div>
-</body>
-
-</html> -->
-const ejsLint = require('ejs-lint');
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Task List</title>
-</head>
-
-<body>
-    <h1>Task List</h1>
-    <form action="/tasktemp/pagination" method="get">
-        <input type="text" name="search" placeholder="Search by task name" value="<%= search %>">
-        <button type="submit">Search</button>
-    </form>
-    <h1>List of all quotes</h1>
-    <ul>
-        <% for(var i=0; i < author.length; i++) { %>
-            <li>
-                <%= author[i] %>
-            </li>
-            <% } %>
-    </ul>
-
-
-
-    <!-- <ul>
-                <%- tasks.forEach(task=> %> {
-                    <li>
-                        <%= task.name %>
-                    </li>
-                    <% }); %>
-            </ul>
-
-
-            <div>
-                <% if (page> 1) { %>
-                    <a href="/tasks?page=<%= page - 1 %>&limit=<%= limit %>&search=<%= search %>">Previous Page</a>
-                    <% } %>
-
-                        <% if (tasks.length===limit) { %>
-                            <a href="/tasks?page=<%= page + 1 %>&limit=<%= limit %>&search=<%= search %>">Next Page</a>
-                            <% } %>
-            </div>
-
-
-            <p>Total Tasks: <%= total %>
-            </p> -->
 </body>
 
 </html>

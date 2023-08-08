@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Task List</title>
+</head>
+
+<body>
+
+    <h1>Task List</h1>
+    <form action="" method="get">
+        <label for="page"><b>Go to Page:</b></label>
+        <input type="number" id="page" name="page" value="<%= page %>">
+        <button type="submit">Go</button>
+        <% if (skip + tasks.length < total) { %>
+            <a href="?page=<%= page + 1 %>&limit=<%= limit %>&search=<%= search %>">Next Page</a>
+            <% } %>
+                <% if (page> 1) { %>
+                    <a href="?page=<%= page - 1 %>&limit=<%= limit %>&search=<%= search %>">Previous Page</a>
+                    <% } %>
+    </form>
+    <ul>
+        <% for (var i=0; i < tasks.length; i++) { %>
+            <table border="2px">
+                <tr>
+                    <li type="1">
+                        <th>Name:</th>
+                        <th> Description:</th>
+                        <th> User ID:</th>
+                        <th> Due Date:</th>
+                        <th> Priority:</th>
+                        <th> Is Completed:</th>
+                        <th> Is Deleted:</th>
+                </tr>
+                <tr>
+
+                    <td>
+                        <%= tasks[i].name %>
+                    </td>
+                    <td>
+                        <%= tasks[i].description %>
+                    </td>
+                    <td>
+                        <%= tasks[i].user_id %>
+                    </td>
+                    <td>
+                        <%= tasks[i].due_date; %>
+
+                    </td>
+                    <td>
+                        <%= tasks[i].priority %>
+                    </td>
+                    <td>
+                        <%= tasks[i].is_completed %>
+                    </td>
+                    <td>
+                        <%= tasks[i].is_deleted %>
+                    </td>
+                </tr>
+                <a href="/tasktemp/update-task/<%= tasks[i]._id %>">Edit</a>
+                </li>
+            </table>
+            <% } %>
+    </ul>
+    <div>
+        <p>Page: <%= page %>
+        </p>
+        <p>Limit: <%= limit %>
+        </p>
+        <p>Total: <%= total %>
+        </p>
+    </div>
+    <div>
+        <% if (page> 1) { %>
+            <a href="?page=<%= page - 1 %>&limit=<%= limit %>&search=<%= search %>">Previous Page</a>
+            <% } %>
+                <% if (skip + tasks.length < total) { %>
+                    <a href="?page=<%= page + 1 %>&limit=<%= limit %>&search=<%= search %>">Next Page</a>
+                    <% } %>
+    </div>
+</body>
+
+</html>
