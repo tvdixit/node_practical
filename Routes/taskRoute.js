@@ -37,11 +37,13 @@ router
     })
     .post("/createtask", upload.single("image"), createTask)
     .get("/getdata", auth(), GetTaskData)
+
     .get("/pagination", TaskdataPagination)
 
-    .get("/update-task/:id", EditTask)
 
-    .post("/edit/task/:id", EditTaskpost)
+    .get("/edit-task/:id", EditTask)
+
+    .post("/update/task/:id", EditTaskpost)
 
     .get("/deleted", deletedtask)
 

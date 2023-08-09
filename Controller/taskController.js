@@ -160,19 +160,17 @@ const EditTask = async (req, res) => {
 //
 const EditTaskpost = async (req, res) => {
     try {
-        console.log(req.body);
-        console.log(req.params.id);
         const taskId = req.params.id;
-
-        // const updatedData = {
-        //     name: req.body.name,
-        //     description: req.body.description
-        // };
-        const updatedTask = await Task.findByIdAndUpdate(taskId);
+        const updatedData = {
+            name: req.body.name,
+            description: req.body.description
+        };
+        const updatedTask = await Task.findByIdAndUpdate(taskId, updatedData);
         if (!updatedTask) {
             return res.status(404).send('Task not found');
         }
-        res.redirect('taskPagination');
+        const savedata = updatedTask.save()
+        res.redirect('/task/Pagination');
     } catch (error) {
         res.status(400).send('Error: ' + error.message);
     }

@@ -23,14 +23,15 @@
         <% for (var i=0; i < tasks.length; i++) { %>
             <table border="2px">
                 <tr>
-                    <li type="1">
-                        <th>Name:</th>
-                        <th> Description:</th>
-                        <th> User ID:</th>
-                        <th> Due Date:</th>
-                        <th> Priority:</th>
-                        <th> Is Completed:</th>
-                        <th> Is Deleted:</th>
+
+                    <th>Name:</th>
+                    <th> Description:</th>
+                    <th> User ID:</th>
+                    <th> Due Date:</th>
+                    <th> Priority:</th>
+                    <th> Is Completed:</th>
+                    <th> Is Deleted:</th>
+                    <th><a href="/task/edit-task/<%= tasks[i]._id %>">Edit</a></th>
                 </tr>
                 <tr>
 
@@ -59,8 +60,7 @@
                         <%= tasks[i].is_deleted %>
                     </td>
                 </tr>
-                <a href="/task/update-task/<%= tasks[i]._id %>">Edit</a>
-                </li>
+                <!-- <a href="/task/edit-task/<%= tasks[i]._id %>">Edit</a> -->
             </table>
             <% } %>
     </ul>
