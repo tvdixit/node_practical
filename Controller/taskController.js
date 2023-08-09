@@ -28,15 +28,6 @@ const GetTaskData = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
-//Get Tasklist With Priority:
-const TaskbyDESC = async (req, res) => {
-    try {
-        const tasks = await Task.find().sort({ created_date: -1 }).exec();
-        res.status(200).json({ tasks });
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to fetch tasks' });
-    }
-}
 //Task Pagination :
 const TaskdataPagination = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -64,88 +55,8 @@ const TaskdataPagination = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
-
-//Get Deleted task :
-const deletedtask = async (req, res) => {
-    try {
-        const tasks = await Task.find({ is_deleted: false }).exec();
-        res.status(200).json(tasks);
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to fetch tasks' });
-    }
-}
-//Get Task by Priority :
-const taskpriority = async (req, res) => {
-    const priority = req.query.priority.toLowerCase();
-
-    if (!['high', 'medium', 'low'].includes(priority)) {
-        return res.status(400).json({ error: 'Invalid priority. Priority must be high, medium, or low.' });
-    }
-
-    try {
-        const tasks = await Task.find({ priority: priority });
-        res.status(200).json(tasks);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
-//Get All Data Priority wise:
-const getAllTasks = async (req, res) => {
-    try {
-        const tasks = await Task.aggregate([
-            {
-                $match: { priority: { $in: ["high", "medium", "low"] } }
-            },
-            {
-                $addFields: {
-                    priorityOrder: {
-                        $switch: {
-                            branches: [
-                                { case: { $eq: ["$priority", "high"] }, then: 1 },
-                                { case: { $eq: ["$priority", "medium"] }, then: 2 },
-                                { case: { $eq: ["$priority", "low"] }, then: 3 }
-                            ],
-                            default: 4
-                        }
-                    }
-                }
-            },
-            {
-                $sort: { priorityOrder: 1 }
-            },
-            {
-                $project: { priorityOrder: 0 }
-            }
-        ]).exec();
-        const tasksArray = tasks.map(task => ({ ...task }));
-        // console.log(tasks, "taskdata");
-        res.status(200).json(tasksArray);
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to fetch tasks by priority' });
-    }
-};
-
 //editTask in template
 const EditTask = async (req, res) => {
-    // try {
-    //     console.log(req.body);
-    //     const taskid = req.params.id;
-    //     const updatedData = {
-    //         name: req.body.name,
-    //         description: req.body.description
-    //     };
-    //     console.log(req.params.id, updatedData);
-    //     const updatedTask = await Task.findByIdAndUpdate(taskid, updatedData);
-
-    //     if (!updatedTask) {
-    //         return res.status(404).json({ message: 'Task not found' });
-    //     }
-
-    //     res.render('task_editPagination', { task: updatedTask });
-    // } catch (error) {
-    //     res.status(400).json({ message: error.message });
-    // }
-
     try {
         const taskId = req.params.id;
         const task = await Task.findByIdAndUpdate(taskId);
@@ -157,85 +68,88 @@ const EditTask = async (req, res) => {
         res.status(400).send('Error: ' + error.message);
     }
 };
-//
+//EditTask Post :
 const EditTaskpost = async (req, res) => {
     try {
         const taskId = req.params.id;
-        const updatedData = {
-            name: req.body.name,
-            description: req.body.description
-        };
-        const updatedTask = await Task.findByIdAndUpdate(taskId, updatedData);
+        const { name, description, is_completed, is_deleted } = req.body
+        const updatedTask = await Task.findByIdAndUpdate(taskId, { name, description, is_completed, is_deleted });
         if (!updatedTask) {
             return res.status(404).send('Task not found');
         }
         const savedata = updatedTask.save()
-        res.redirect('/task/Pagination');
+        res.redirect('/task/Paginate')
+        // res.redirect('/task/Pagination')
     } catch (error) {
         res.status(400).send('Error: ' + error.message);
     }
 }
-// new gettask by priority pagination
+//new gettask by priority pagination:
 const getTasksByPriorityPagination = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    let priority = req.query.priority;
     const search = req.query.search || '';
+    let is_completed = req.query.is_completed;
+    let is_deleted = req.query.is_deleted;
 
     try {
-        const tasks = await Task.aggregate([
-            {
-                $match: { priority: { $in: ["high", "medium", "low"] } }
-            },
-            {
-                $addFields: {
-                    priorityOrder: {
-                        $switch: {
-                            branches: [
-                                { case: { $eq: ["$priority", "high"] }, then: 1 },
-                                { case: { $eq: ["$priority", "medium"] }, then: 2 },
-                                { case: { $eq: ["$priority", "low"] }, then: 3 }
-                            ],
-                            default: 4
-                        }
+        const allowedPriorities = ['high', 'medium', 'low'];
+        if (!allowedPriorities.includes(priority)) {
+            priority = 'all';
+        }
+        const allowedOptions = ['0', '1'];
+        if (!allowedOptions.includes(is_completed)) {
+            is_completed = 'all';
+        }
+        if (!allowedOptions.includes(is_deleted)) {
+            is_deleted = 'all';
+        }
+        const matchStage = {
+            $and: [
+                priority === 'all' ? {} : { priority: priority },
+                is_completed === 'all' ? {} : { is_completed: parseInt(is_completed) },
+                is_deleted === 'all' ? {} : { is_deleted: parseInt(is_deleted) }
+            ]
+        };
+        const tasks = await Task.aggregate([{ $match: matchStage },
+        {
+            $addFields: {
+                priorityOrder: {
+                    $switch: {
+                        branches: [
+                            { case: { $eq: ["$priority", "high"] }, then: 1 },
+                            { case: { $eq: ["$priority", "medium"] }, then: 2 },
+                            { case: { $eq: ["$priority", "low"] }, then: 3 }
+                        ], default: 4
                     }
                 }
-            },
-            {
-                $sort: { priorityOrder: 1 }
-            },
-            {
-                $project: { priorityOrder: 0 }
-            },
-            {
-                $skip: (page - 1) * limit
-            },
-            {
-                $limit: limit
             }
+        },
+        { $sort: { priorityOrder: 1 } },
+        { $project: { priorityOrder: 0 } },
+        { $skip: (page - 1) * limit },
+        { $limit: limit }
         ]).exec();
-
         const tasksArray = tasks.map(task => ({ ...task }));
-
         res.render('NewPagination', {
             tasksArray,
             tasks: tasks,
-            page: parseInt(req.query.page) || 1,
-            limit: parseInt(req.query.limit) || 10,
-            search: search
+            page: page,
+            limit: limit,
+            search: search,
+            priority: priority,
+            is_completed: is_completed,
+            is_deleted: is_deleted
         });
     } catch (err) {
-        res.status(500).json({ error: 'Failed to fetch tasks by priority' });
+        res.status(500).json({ error: 'Failed to fetch tasks' });
     }
 };
-
 module.exports = {
     createTask,
     GetTaskData,
-    TaskbyDESC,
     TaskdataPagination,
-    deletedtask,
-    taskpriority,
-    getAllTasks,
     EditTask,
     getTasksByPriorityPagination,
     EditTaskpost

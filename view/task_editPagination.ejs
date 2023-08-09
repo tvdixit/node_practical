@@ -12,9 +12,19 @@
         <input type="text" id="name" name="name" value="<%= task.name %>"><br><br>
         <label for="description">Description:</label>
         <textarea id="description" name="description"><%= task.description %></textarea><br><br>
+
+        <label for="is_completed">Is Completed:</label>
+        <select id="is_completed" name="is_completed">
+            <option value="1" <%=task.is_completed ? 'selected' : '' %>>Yes</option>
+            <option value="0" <%=!task.is_completed ? 'selected' : '' %>>No</option>
+        </select><br><br>
+        <label for="is_deleted">Is Deleted:</label>
+        <select id="is_deleted" name="is_deleted">
+            <option value="1" <%=task.is_deleted ? 'selected' : '' %>>Yes</option>
+            <option value="0" <%=!task.is_deleted ? 'selected' : '' %>>No</option>
+        </select><br><br>
         <button type="submit">Save Changes</button>
     </form>
-
 </body>
 
 </html>
