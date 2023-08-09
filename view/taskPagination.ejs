@@ -44,7 +44,9 @@
                         <%= tasks[i].user_id %>
                     </td>
                     <td>
-                        <%= tasks[i].due_date; %>
+                        <!-- <%= tasks[i].due_date; %> -->
+                        <%= tasks[i].due_date.toLocaleDateString("en-GB", { weekday: 'short' , day: '2-digit' ,
+                            month: '2-digit' , year: 'numeric' }) %>
 
                     </td>
                     <td>
@@ -57,7 +59,7 @@
                         <%= tasks[i].is_deleted %>
                     </td>
                 </tr>
-                <a href="/tasktemp/update-task/<%= tasks[i]._id %>">Edit</a>
+                <a href="/task/update-task/<%= tasks[i]._id %>">Edit</a>
                 </li>
             </table>
             <% } %>

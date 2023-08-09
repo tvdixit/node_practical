@@ -1,22 +1,21 @@
 const Joi = require("joi")
 
-const validateDueDate = (value, helpers) => {
-    const regexPattern = /^\d{2}\/\d{2}\/\d{2}$/;
-    if (!regexPattern.test(value)) {
-        return helpers.error('any.invalid');
-    }
-    return value;
-};
+// const validateDueDate = (value, helpers) => {
+//     const regexPattern = /^\d{2}\/\d{2}\/\d{2}$/;
+//     if (!regexPattern.test(value)) {
+//         return helpers.error('any.invalid');
+//     }
+//     return value;
+// };
 const CreateTaskValidation = {
     file: Joi.object().keys({
         Image: Joi.array().required()
     }),
-
     body: Joi.object().keys({
         name: Joi.string().required(),
         description: Joi.string().required(),
         user_id: Joi.string().required(),
-        due_date: Joi.date().custom(validateDueDate).required(),
+        due_date: Joi.date().required(),
         priority: Joi.string().valid('high', 'medium', 'low').required(),
         is_completed: Joi.number().required(),
         is_deleted: Joi.number().required(),

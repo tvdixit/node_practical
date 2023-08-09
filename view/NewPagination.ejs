@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tasks by Priority</title>
+</head>
+
+<body>
+
+    <h1>Tasks by Priority</h1>
+    <ul>
+        <form action="" method="get">
+            <label for="page"><b>Go to Page:</b></label>
+            <input type="number" id="page" name="page" value="<%= page %>">
+            <button type="submit">Go</button>
+
+            <% if (page> 1) { %>
+                <a href="?page=<%= page - 1 %>&limit=<%= limit %>">Previous Page</a>
+                <% } %>
+                    <% if (tasks.length===limit) { %>
+                        <a href="?page=<%= page + 1 %>&limit=<%= limit %>">Next Page</a>
+                        <% } %>
+
+        </form>
+        <% for (var i=0; i < tasks.length; i++) { %>
+
+            <table border="1">
+                <tr>
+                    <li type="1">
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>User ID</th>
+                        <th>Due Date</th>
+                        <th>Priority</th>
+                        <th>Is Completed</th>
+                        <th>Is Deleted</th>
+                </tr>
+                <tr>
+                    <td>
+                        <%= tasks[i].name %>
+                    </td>
+                    <td>
+                        <%= tasks[i].description %>
+                    </td>
+                    <td>
+                        <%= tasks[i].user_id %>
+                    </td>
+                    <td>
+                        <!-- <%= tasks[i].due_date %> -->
+
+
+                        <%= tasks[i].due_date.toLocaleDateString("en-GB", { weekday: 'short' , day: '2-digit' ,
+                            month: '2-digit' , year: 'numeric' }) %>
+
+                    </td>
+                    <td>
+                        <%= tasks[i].priority %>
+                    </td>
+                    <td>
+                        <%= tasks[i].is_completed %>
+                    </td>
+                    <td>
+                        <%= tasks[i].is_deleted %>
+                    </td>
+                </tr>
+            </table>
+            </li>
+            <% } %>
+    </ul>
+
+    <div>
+        <p>Page: <%= page %>
+        </p>
+        <p>Limit: <%= limit %>
+        </p>
+    </div>
+    <div>
+        <% if (page> 1) { %>
+            <a href="?page=<%= page - 1 %>&limit=<%= limit %>">Previous Page</a>
+            <% } %>
+                <% if (tasks.length===limit) { %>
+                    <a href="?page=<%= page + 1 %>&limit=<%= limit %>">Next Page</a>
+                    <% } %>
+    </div>
+
+</body>
+
+</html>

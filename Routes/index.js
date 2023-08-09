@@ -1,13 +1,10 @@
 const createUser = require("./userRoute");
 const createTask = require("./taskRoute")
-const UserTemplate = require("./UserTempRoute")
-const taskTemplate = require("./TaskTempRoute")
-const LoginTemplate = require("./LoginTempRoute")
+// const taskTemplate = require("./TaskTempRoute")
+
 
 module.exports = {
     createUser,
     createTask,
-    UserTemplate,
-    taskTemplate,
-    LoginTemplate
+    // taskTemplate,
 }

@@ -1,32 +1,17 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const Task = require("../Schema/taskSchema");
-const ejs = require('ejs');
-const fs = require('fs');
-const moment = require('moment');
+const express = require('express');
+const app = express();
+app.use(express.json());
 
-exports.index = function (req, res) {
-    res.render('server', { moment: moment });
-}
 //Create Task Api
 const createTask = async (req, res) => {
-
+    console.log(req.body)
     try {
-        const { name, description, image, user_id, due_date, priority, is_completed, is_deleted } = req.body
-
-        const parsedDueDate = moment(due_date).format('DD/MM/YYYY');
         const newTask = new Task({
-            name,//: req.body.name,
-            description, //: req.body.description,
-            image,//: newobject,
-            user_id,//: req.body.user_id,
-            due_date: parsedDueDate,//: req.body.due_date,
-            priority,//: req.body.priority,
-            is_completed,//: req.body.is_completed,
-            is_deleted//: req.body.is_deleted
+            ...req.body,
         });
-        console.log(parsedDueDate, "duedate");
-        console.log(due_date);
         const savedTask = await newTask.save();
         res.status(201).json({ savedTask });
     } catch (error) {
@@ -79,52 +64,7 @@ const TaskdataPagination = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
-//Delete Task by Token :
-const deleteTaskData = async (req, res) => {
-    try {
-        const data = await Task.findOneAndDelete({ user_id: req.user.user_id });
-        res.json({ success: true, message: "delete data successfully", data })
-    }
-    catch (error) {
-        res.status(500).json({ message: error.message })
-    }
-}
-//Update Task Status _iscompleted
-const updatetask = async (req, res) => {
-    try {
-        const task = await Task.findById(req.query.id);
-        if (!task) {
-            return res.status(404).json({ error: 'Task not found' });
-        }
-        if (task.user_id == req.user.user_id) {
-            task.is_completed = 1;
-            const updatedTask = await task.save();
-            res.status(200).json(updatedTask);
-        } else {
-            res.status(403).json({ error: "user_id is not match" })
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to mark the task as completed' });
-    }
-}
-//Delete Task Status is_deleted
-const deletetask = async (req, res) => {
-    try {
-        const task = await Task.findById(req.query.id);
-        if (!task) {
-            return res.status(404).json({ error: 'Task not found' });
-        }
-        if (task.user_id == req.user.user_id) {
-            task.is_deleted = 1;
-            const updatedTask = await task.save();
-            res.status(200).json(updatedTask);
-        } else {
-            res.status(403).json({ error: "user_id is not match" })
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to mark the task as deleted' });
-    }
-}
+
 //Get Deleted task :
 const deletedtask = async (req, res) => {
     try {
@@ -185,51 +125,120 @@ const getAllTasks = async (req, res) => {
     }
 };
 
-// update api :
-const UpdateTask = async (req, res) => {
-    try {
-        const data = await Task.findOne({ _id: req.params.id })
-
-        data.set(req.body);
-        const updatedUser = await data.save();
-        res.json({ updatedUser });
-    } catch (error) {
-        res.status(400).json({ message: error.message })
-    }
-}
-
+//editTask in template
 const EditTask = async (req, res) => {
+    // try {
+    //     console.log(req.body);
+    //     const taskid = req.params.id;
+    //     const updatedData = {
+    //         name: req.body.name,
+    //         description: req.body.description
+    //     };
+    //     console.log(req.params.id, updatedData);
+    //     const updatedTask = await Task.findByIdAndUpdate(taskid, updatedData);
+
+    //     if (!updatedTask) {
+    //         return res.status(404).json({ message: 'Task not found' });
+    //     }
+
+    //     res.render('task_editPagination', { task: updatedTask });
+    // } catch (error) {
+    //     res.status(400).json({ message: error.message });
+    // }
+
     try {
-        const taskid = req.params.id
-        const updatedTaskData = {
-            name: req.body.name,
-            description: req.body.description
-
-        };
-        const task = await Task.findByIdAndUpdate(taskid, updatedTaskData, { new: true });
-        console.log(task, "task");
+        const taskId = req.params.id;
+        const task = await Task.findByIdAndUpdate(taskId);
         if (!task) {
-            return res.status(404).json({ message: 'Task not found' });
+            return res.status(404).send('Task not found');
         }
-        const savedata = task.save()
         res.render('task_editPagination', { task });
-
-
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).send('Error: ' + error.message);
     }
 };
+//
+const EditTaskpost = async (req, res) => {
+    try {
+        console.log(req.body);
+        console.log(req.params.id);
+        const taskId = req.params.id;
+
+        // const updatedData = {
+        //     name: req.body.name,
+        //     description: req.body.description
+        // };
+        const updatedTask = await Task.findByIdAndUpdate(taskId);
+        if (!updatedTask) {
+            return res.status(404).send('Task not found');
+        }
+        res.redirect('taskPagination');
+    } catch (error) {
+        res.status(400).send('Error: ' + error.message);
+    }
+}
+// new gettask by priority pagination
+const getTasksByPriorityPagination = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || '';
+
+    try {
+        const tasks = await Task.aggregate([
+            {
+                $match: { priority: { $in: ["high", "medium", "low"] } }
+            },
+            {
+                $addFields: {
+                    priorityOrder: {
+                        $switch: {
+                            branches: [
+                                { case: { $eq: ["$priority", "high"] }, then: 1 },
+                                { case: { $eq: ["$priority", "medium"] }, then: 2 },
+                                { case: { $eq: ["$priority", "low"] }, then: 3 }
+                            ],
+                            default: 4
+                        }
+                    }
+                }
+            },
+            {
+                $sort: { priorityOrder: 1 }
+            },
+            {
+                $project: { priorityOrder: 0 }
+            },
+            {
+                $skip: (page - 1) * limit
+            },
+            {
+                $limit: limit
+            }
+        ]).exec();
+
+        const tasksArray = tasks.map(task => ({ ...task }));
+
+        res.render('NewPagination', {
+            tasksArray,
+            tasks: tasks,
+            page: parseInt(req.query.page) || 1,
+            limit: parseInt(req.query.limit) || 10,
+            search: search
+        });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch tasks by priority' });
+    }
+};
+
 module.exports = {
     createTask,
     GetTaskData,
     TaskbyDESC,
     TaskdataPagination,
-    deleteTaskData,
-    updatetask,
-    deletetask,
     deletedtask,
     taskpriority,
     getAllTasks,
-    UpdateTask,
-    EditTask
+    EditTask,
+    getTasksByPriorityPagination,
+    EditTaskpost
 }
