@@ -1,0 +1,62 @@
+<html>
+
+<head>
+    <title>Create User</title>
+</head>
+
+<body style="background-color: burlywood;">
+    <h1>Create User</h1>
+
+
+    <form method="post" action="/user/createuser" id="createUserForm">
+
+        <label for="first_name">First Name:</label>
+        <input type="text" name="first_name" id="first_name">
+        <br>
+        <label for="last_name">Last Name:</label>
+        <input type="text" name="last_name" id="last_name">
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email">
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password">
+        <br>
+        <button type="submit">Create User</button>
+    </form>
+    <div id="errorMessage" style="color: red;"></div>
+    <script>
+        const createUserForm = document.getElementById('createUserForm');
+        createUserForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(createUserForm);
+            const userData = {
+                first_name: formData.get('first_name'),
+                last_name: formData.get('last_name'),
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+            try {
+                const response = await fetch('/user/createuser', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('authToken', data.auth);
+                    window.location.href = '/task/pagination';
+                } else {
+                    errorMessage.textContent = data.message;
+                }
+                console.log(data.auth)
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>

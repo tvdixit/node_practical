@@ -5,7 +5,7 @@ const router = express.Router();
 const multer = require("multer")
 const { auth } = require("../middleware/auth")
 const validate = require("../middleware/validate")
-const { CreateTaskValidation, priorityCheck } = require("../Validation/taskValidation")
+const { CreateTaskValidation, validateEditTaskInput } = require("../Validation/taskValidation")
 const { createTask, GetTaskData, TaskdataPagination, EditTask, getTasksByPriorityPagination, EditTaskpost } = require("../Controller/taskController");
 
 const storage = multer.diskStorage({
@@ -24,7 +24,7 @@ router
     .get("/getdata", auth(), GetTaskData)
     .get("/pagination", TaskdataPagination)
     .get("/edit-task/:id", EditTask)
-    .post("/update/task/:id", EditTaskpost)
+    .post("/update/task/:id", validate(validateEditTaskInput), EditTaskpost)
     .get("/paginate", getTasksByPriorityPagination)
 module.exports = {
     route: router

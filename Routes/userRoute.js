@@ -8,10 +8,11 @@ const { createUser, GetUserData, Userlogin } = require("../Controller/userContro
 const { CreateUserValidation, LoginValidation, idValidation } = require("../Validation/userValidation")
 
 router
-    .get("/form", (req, res) => {
-        res.render('userTemplate');
+    .get("/createuser", (req, res) => {
+        res.render('createUser');
     })
-    .post("/createuser", validate(CreateUserValidation), createUser)
+    // .post("/createuser", validate(CreateUserValidation), createUser)
+    .post("/createuser", createUser)
     .get('/login', (req, res) => {
         res.render('loginTemplate', { user: null })
     })

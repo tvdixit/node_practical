@@ -17,8 +17,10 @@ const createUser = async (req, res) => {
             ...req.body,
             password: hashedPassword,
         })
+
         const savedata = await userdata.save();
-        res.status(200).json({ savedata });
+        const token = jwt.sign({ user_id: savedata._id, email: savedata.email }, process.env.SECRET_KEY, { expiresIn: '24h' });
+        res.status(200).json({ savedata, auth: token });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -40,18 +42,18 @@ const Userlogin = async (req, res) => {
         const users = await User.findOne({ email })
         console.log(users);
         if (!users) {
-            return res.status(401).json("invalid email or password")
+            return res.status(401).json({ status: false, message: "invalid email or password" });
         }
         const matchPassword = await bcrypt.compare(password, users.password)
         if (!matchPassword) {
-            res.status(400).json({ message: 'password not match Try again' })
+            res.status(400).json({ status: false, message: 'password not match Try again' });
         } else {
             const token = jwt.sign({ user_id: users._id, email }, process.env.SECRET_KEY, { expiresIn: '24h' });
-            res.status(200).json({ token })
+            res.status(200).json({ status: true, auth: token });
         }
     } catch (err) {
-        res.status(400).json({ message: "Error" });
-        console.log(err);
+        res.status(500).json({ status: false, message: "Error" });
+        console.error(err);
     }
 };
 module.exports = {

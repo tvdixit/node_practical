@@ -27,9 +27,19 @@ const priorityCheck = {
         priority: Joi.string().required(),
     })
 }
+const validateEditTaskInput = {
+    body: Joi.object({
+        name: Joi.string().required(),
+        description: Joi.string().required(),
+        is_completed: Joi.string().required(),
+        is_deleted: Joi.string().required()
+    })
+}
+
 module.exports = {
     CreateTaskValidation,
     idValidation,
     taskidValidation,
-    priorityCheck
+    priorityCheck,
+    validateEditTaskInput
 }

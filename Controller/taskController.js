@@ -58,8 +58,8 @@ const TaskdataPagination = async (req, res) => {
 //editTask in template
 const EditTask = async (req, res) => {
     try {
-        const taskId = req.params.id;
-        const task = await Task.findByIdAndUpdate(taskId);
+
+        const task = await Task.findByIdAndUpdate(req.params.id);
         if (!task) {
             return res.status(404).send('Task not found');
         }
@@ -146,11 +146,12 @@ const getTasksByPriorityPagination = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch tasks' });
     }
 };
+
 module.exports = {
     createTask,
     GetTaskData,
     TaskdataPagination,
     EditTask,
     getTasksByPriorityPagination,
-    EditTaskpost
+    EditTaskpost,
 }
