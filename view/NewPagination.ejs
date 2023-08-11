@@ -63,10 +63,8 @@
                         <%= tasks[i].user_id %>
                     </td>
                     <td>
-
                         <%= tasks[i].due_date.toLocaleDateString("en-GB", { weekday: 'short' , day: '2-digit' ,
                             month: '2-digit' , year: 'numeric' }) %>
-
                     </td>
                     <td>
                         <%= tasks[i].priority %>
@@ -105,6 +103,41 @@
                     <% } %>
     </div>
 
+    <script>
+        const authToken = localStorage.getItem('authToken');
+        console.log(authToken, "token");
+        const tasksData = JSON.stringify(tasksArray);
+
+        if (authToken) {
+            try {
+                const tokenParts = authToken.split('.');
+                const payload = JSON.parse(atob(tokenParts[1]));
+                const user_id_from_token = payload.user_id;
+
+                console.log('Decoded user_id:', user_id_from_token);
+
+
+                filteredTasks.forEach((task, index) => {
+                    const newRow = tableBody.insertRow(index);
+                    newRow.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${task.name}</td>
+                        <td>${task.description}</td>
+                        <td>${task.user_id}</td>
+                        <td>${new Date(task.due_date).toLocaleDateString("en-GB", {
+                        weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric'
+                    })}</td>
+                        <td>${task.priority}</td>
+                        <td>${task.is_completed}</td>
+                        <td>${task.is_deleted}</td>
+                        <td><a href="/task/edit-task/${task._id}">Edit</a></td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error decoding token:', error);
+            }
+        }
+    </script>
 </body>
 
 </html>

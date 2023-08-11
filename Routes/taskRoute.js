@@ -26,6 +26,8 @@ router
     .get("/edit-task/:id", EditTask)
     .post("/update/task/:id", validate(validateEditTaskInput), EditTaskpost)
     .get("/paginate", getTasksByPriorityPagination)
+// .get("/paginate", auth(), getTasksByPriorityPagination)
+
 module.exports = {
     route: router
 }

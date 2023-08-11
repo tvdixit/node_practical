@@ -90,7 +90,7 @@ const getTasksByPriorityPagination = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     let priority = req.query.priority;
     const search = req.query.search || '';
-    let is_completed = req.query.is_completed;
+    let is_completed = req.query.is_completed
     let is_deleted = req.query.is_deleted;
 
     try {
@@ -109,7 +109,8 @@ const getTasksByPriorityPagination = async (req, res) => {
             $and: [
                 priority === 'all' ? {} : { priority: priority },
                 is_completed === 'all' ? {} : { is_completed: parseInt(is_completed) },
-                is_deleted === 'all' ? {} : { is_deleted: parseInt(is_deleted) }
+                is_deleted === 'all' ? {} : { is_deleted: parseInt(is_deleted) },
+
             ]
         };
         const tasks = await Task.aggregate([{ $match: matchStage },
@@ -140,12 +141,80 @@ const getTasksByPriorityPagination = async (req, res) => {
             search: search,
             priority: priority,
             is_completed: is_completed,
-            is_deleted: is_deleted
-        });
+            is_deleted: is_deleted,
+        })
     } catch (err) {
         res.status(500).json({ error: 'Failed to fetch tasks' });
     }
 };
+
+
+// it is working in postman 
+// const getTasksByPriorityPagination = async (req, res) => {
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 10;
+//     let priority = req.query.priority;
+//     const search = req.query.search || '';
+//     let is_completed = req.query.is_completed
+//     let is_deleted = req.query.is_deleted;
+//     const user_id = req.user.user_id
+
+//     try {
+//         const allowedPriorities = ['high', 'medium', 'low'];
+//         if (!allowedPriorities.includes(priority)) {
+//             priority = 'all';
+//         }
+//         const allowedOptions = ['0', '1'];
+//         if (!allowedOptions.includes(is_completed)) {
+//             is_completed = 'all';
+//         }
+//         if (!allowedOptions.includes(is_deleted)) {
+//             is_deleted = 'all';
+//         }
+//         const matchStage = {
+//             $and: [
+//                 { user_id: new mongoose.Types.ObjectId(user_id) },
+//                 priority === 'all' ? {} : { priority: priority },
+//                 is_completed === 'all' ? {} : { is_completed: parseInt(is_completed) },
+//                 is_deleted === 'all' ? {} : { is_deleted: parseInt(is_deleted) },
+//             ]
+//         };
+//         console.log(matchStage, "matchstage");
+//         const tasks = await Task.aggregate([{ $match: matchStage },
+//         {
+//             $addFields: {
+//                 priorityOrder: {
+//                     $switch: {
+//                         branches: [
+//                             { case: { $eq: ["$priority", "high"] }, then: 1 },
+//                             { case: { $eq: ["$priority", "medium"] }, then: 2 },
+//                             { case: { $eq: ["$priority", "low"] }, then: 3 }
+//                         ], default: 4
+//                     }
+//                 }
+//             }
+//         },
+//         { $sort: { priorityOrder: 1 } },
+//         { $skip: (page - 1) * limit },
+//         { $limit: limit }
+//         ]).exec();
+
+//         res.render("NewPagination", {
+//             tasks,
+//             page,
+//             limit,
+//             search,
+//             priority,
+//             is_completed,
+//             is_deleted,
+//             user_id,
+//         })
+//     } catch (err) {
+//         res.status(500).json({ error: 'Failed to fetch tasks' });
+//         console.log(err);
+//     }
+// };
+
 
 module.exports = {
     createTask,

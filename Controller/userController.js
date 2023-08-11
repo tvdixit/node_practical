@@ -1,6 +1,7 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const User = require("../Schema/userSchema");
+const Task = require("../Schema/taskSchema");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -40,17 +41,19 @@ const Userlogin = async (req, res) => {
     try {
         const { email, password } = req.body
         const users = await User.findOne({ email })
-        console.log(users);
+        // console.log(users);
         if (!users) {
             return res.status(401).json({ status: false, message: "invalid email or password" });
         }
         const matchPassword = await bcrypt.compare(password, users.password)
+
         if (!matchPassword) {
             res.status(400).json({ status: false, message: 'password not match Try again' });
-        } else {
-            const token = jwt.sign({ user_id: users._id, email }, process.env.SECRET_KEY, { expiresIn: '24h' });
-            res.status(200).json({ status: true, auth: token });
         }
+        const token = jwt.sign({ user_id: users._id, email }, process.env.SECRET_KEY, { expiresIn: '24h' });
+
+        res.status(200).json({ status: true, auth: token });
+
     } catch (err) {
         res.status(500).json({ status: false, message: "Error" });
         console.error(err);
